@@ -27,4 +27,10 @@ jobs:
           echo "FT_USER=${{ secrets.FT_USER }}" >> $GITHUB_ENV
           echo "FT_PASS=${{ secrets.FT_PASS }}" >> $GITHUB_ENV
       
+      # start the Finance-Tracker app in the background
+      - name: Launch Finance-Tracker
+        run: |
+          python app/app.py &
+          sleep 3   # give server time to bind on :5000
+
       - run: pytest -q

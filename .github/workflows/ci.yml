@@ -3,34 +3,36 @@ on: [push, pull_request]
 
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.04              # pin runner to 22.04 so Playwright deps install cleanly
     steps:
+      #1  Check out repo
       - uses: actions/checkout@v4
 
+      #2 Pull submodule with the Flask demo
+      - name: Init submodules
+        run: git submodule update --init --recursive
+
+      #3 Set up Python 3.12
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
+      #4 Install Python deps and Playwright browsers
       - run: pip install -r requirements.txt
       - run: playwright install --with-deps
 
-      # debug step
-      - name: Show workspace
-        run: |
-          echo "### workspace content ###"
-          ls -R
-          echo "### end workspace ###"
-
-      # export secrets as env vars for pytest
+      #5 Export login credentials from GitHub Secrets
       - name: Set credentials
         run: |
           echo "FT_USER=${{ secrets.FT_USER }}" >> $GITHUB_ENV
           echo "FT_PASS=${{ secrets.FT_PASS }}" >> $GITHUB_ENV
-      
-      # start the Finance-Tracker app in the background
+
+      # 6 Launch Finance-Tracker Flask server in the background
       - name: Launch Finance-Tracker
         run: |
-          python app/app.py &
-          sleep 3   # give server time to bind on :5000
+          cd app                       # enter submodule folder
+          python app.py &              # start server on :5000
+          sleep 3                      # brief pause so server is ready
 
+      #7 Run Playwright test suite
       - run: pytest -q

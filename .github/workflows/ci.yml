@@ -27,6 +27,9 @@ jobs:
           echo "FT_USER=${{ secrets.FT_USER }}" >> $GITHUB_ENV
           echo "FT_PASS=${{ secrets.FT_PASS }}" >> $GITHUB_ENV
 
+      #6 install the app’s requirements launching
+      - run: pip install -r app/requirements.txt      # NEW: Flask, SQLAlchemy, etc.
+
       # 6 Launch Finance-Tracker Flask server in the background
       - name: Launch Finance-Tracker
         run: |

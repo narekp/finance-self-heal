@@ -1,8 +1,10 @@
 # scripts/seed_user.py
 import sqlite3, os, pathlib
 
-DB = pathlib.Path(__file__).resolve().parent / "app" / "finance_tracker.db"
-email = os.environ["FT_USER"]
+ROOT = pathlib.Path(__file__).resolve().parent.parent   # go up to repo root
+DB   = ROOT / "app" / "finance_tracker.db"
+
+email    = os.environ["FT_USER"]
 password = os.environ["FT_PASS"]
 
 with sqlite3.connect(DB) as conn:

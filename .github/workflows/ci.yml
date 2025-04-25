@@ -14,10 +14,17 @@ jobs:
       - run: pip install -r requirements.txt
       - run: playwright install --with-deps
 
+      # debug step
+      - name: Show workspace
+        run: |
+          echo "### workspace content ###"
+          ls -R
+          echo "### end workspace ###"
+
       # export secrets as env vars for pytest
       - name: Set credentials
         run: |
           echo "FT_USER=${{ secrets.FT_USER }}" >> $GITHUB_ENV
           echo "FT_PASS=${{ secrets.FT_PASS }}" >> $GITHUB_ENV
-
+      
       - run: pytest -q

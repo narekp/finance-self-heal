@@ -1,0 +1,7 @@
+playwright==1.44.0
+pytest
+pytest-playwright
+rapidfuzz
+beautifulsoup4
+rich
+python-dotenv

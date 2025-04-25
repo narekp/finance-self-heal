@@ -33,9 +33,10 @@ jobs:
       # 6 Launch Finance-Tracker Flask server in the background
       - name: Launch Finance-Tracker
         run: |
-          cd app                       # enter submodule folder
-          python app.py &              # start server on :5000
-          sleep 3                      # brief pause so server is ready
+          python scripts/seed_user.py          # seed DB first
+          cd app                               # enter submodule
+          python app.py &                      # start server
+          sleep 3
 
       #7 Run Playwright test suite
       - run: pytest -q

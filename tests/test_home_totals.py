@@ -31,7 +31,7 @@ def add_txn(page, tag, amt, pay_method):
     page.fill("#date", "2025-05-01")
     page.select_option("#category", label="Food")
     fuzzy_find(page, "input#amount").fill(str(amt))
-    page.select_option("#payment_method", label=pay_method)
+    page.locator("select#payment_method").select_option(label=pay_method)
     page.fill("#notes", tag)
     page.click("#popup button[type='submit']")
 

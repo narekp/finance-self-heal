@@ -22,7 +22,7 @@ def test_add_transaction(page):
     page.fill("#date", "2025-04-25")
     page.select_option("#category", label="Food")
     fuzzy_find(page, "input#amount").fill("123")
-    page.select_option("#payment_method", label="Cash")
+    page.locator("select#payment_method").select_option(label="Cash")
     page.fill("#notes", f"AutoTest-{tag}")
     page.click("#popup button[type='submit']")
 

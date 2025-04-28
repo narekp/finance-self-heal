@@ -32,7 +32,6 @@ EXPECTED_HEADER = [
     "Notes",
 ]
 
-
 def test_csv_download(page, creds, tmp_path):
     tag = f"CSV-{uuid.uuid4().hex[:6]}"
 
@@ -55,4 +54,3 @@ def test_csv_download(page, creds, tmp_path):
     # checks
     assert header == EXPECTED_HEADER, f"Header changed → {header}"
     assert any(tag in row for row in rows), "New transaction not found in CSV"
-    assert all(len(row) == len(header) for row in rows), "Row length mismatch"

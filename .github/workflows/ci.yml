@@ -39,4 +39,5 @@ jobs:
           sleep 3
 
       #7 Run Playwright test suite
-      - run: pytest -v
+      - name: Run Playwright test suite
+        run: pytest --capture=tee-sys -v    # streams Rich output

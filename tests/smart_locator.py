@@ -1,3 +1,7 @@
+import sys
+from rich.console import Console    # show HEAL logs
+console = Console(file=sys.stdout)  # stream to stdout
+
 from playwright.sync_api import Locator, Page
 from rapidfuzz import fuzz
 from bs4 import BeautifulSoup

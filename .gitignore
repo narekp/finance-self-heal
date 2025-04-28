@@ -10,4 +10,4 @@ __pycache__/
 playwright-report/
 
 # locator cache
-locator_cache.json
+locator_cache.jsonfinance_tracker.db

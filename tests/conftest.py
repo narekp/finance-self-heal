@@ -1,6 +1,9 @@
 # ──────────────────────────────────────────────────────────────
 # tests/conftest.py
 # ──────────────────────────────────────────────────────────────
+import sys, rich
+from tests.smart_locator import HEAL_EVENTS
+
 import os, pytest, functools, re
 from dotenv import load_dotenv, find_dotenv
 from playwright.sync_api import Page, TimeoutError as PWTimeout
@@ -52,3 +55,13 @@ class _SmartLocator:
     def _should_heal(self) -> bool:
         m = re.match(r"(\w+)", self._orig)
         return m and m.group(1).lower() in HEAL_TAGS
+
+def pytest_sessionfinish(session, exitstatus):
+    """Print one-line summary after all tests."""
+    console = rich.console.Console(file=sys.stdout)
+    if not HEAL_EVENTS:
+        console.print("[green bold]🟢 0 selectors healed (cache up-to-date)")
+    else:
+        console.print(f"[yellow bold]🟡 {len(HEAL_EVENTS)} selectors healed this run:")
+        for orig, new, score in HEAL_EVENTS:
+            console.print(f"   {orig:<25} → {new:<25} ({score} %)")

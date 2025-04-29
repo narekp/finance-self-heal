@@ -15,6 +15,9 @@ ALLOWED_TAGS = ["input", "textarea", "select"]
 # Lower threshold to 60 to handle small id changes like 'amt' vs 'amount'
 DEFAULT_THRESHOLD = 60
 
+# ─── NEW: store (orig, new, score) for this session ───────────
+HEAL_EVENTS: list[tuple[str, str, int]] = []
+
 def fuzzy_find(page: Page, orig_css: str, thresh: int = DEFAULT_THRESHOLD) -> Locator:
     """
     Fuzzy-locates a form element by id/name/content, caching fixes for future runs.
@@ -44,6 +47,14 @@ def fuzzy_find(page: Page, orig_css: str, thresh: int = DEFAULT_THRESHOLD) -> Lo
             selector += f"#{best_el['id']}"
         elif best_el.get("class"):
             selector += f".{best_el['class'][0]}"
+        # Append + log when a heal occurs
+        score_int = int(best_score)
+        HEAL_EVENTS.append((orig_css, selector, score_int))
+        console.log(
+            f"[green]✅ Healed[/] '{orig_css}' → '{selector}' "
+            f"({score_int} %)"
+        )
+
         _update_cache(orig_css, selector)
         return page.locator(selector)
 

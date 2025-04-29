@@ -49,11 +49,11 @@ def fuzzy_find(page: Page, orig_css: str, thresh: int = DEFAULT_THRESHOLD) -> Lo
             selector += f".{best_el['class'][0]}"
         # Append + log when a heal occurs
         score_int = int(best_score)
-        HEAL_EVENTS.append((orig_css, selector, score_int))
-        console.log(
-            f"[green]✅ Healed[/] '{orig_css}' → '{selector}' "
-            f"({score_int} %)"
-        )
+        if selector != orig_css and (orig_css, selector) not in {(o, n) for o, n, _ in HEAL_EVENTS}:
+            HEAL_EVENTS.append((orig_css, selector, score_int))
+            console.log(
+                f"[green]✅ Healed[/] '{orig_css}' → '{selector}' ({score_int} %)"
+    )
 
         _update_cache(orig_css, selector)
         return page.locator(selector)

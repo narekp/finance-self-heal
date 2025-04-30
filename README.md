@@ -47,12 +47,10 @@ pytest -q
 
 ## 📋 Current Status
 
- | Capability                             	| Status     |
- |----------------------------------------	|:----------:|
--| ID & Name attribute healing            	| ✅ Done     |
--| `data-testid` fallback healing         	| 🔜 Pending  |
-+| ID & Name attribute healing            	| ✅ Done     |
-+| `data-testid` fallback healing         	| ✅ Done     |
- | Dynamic loading & auto-waits           	| 🔜 Pending  |
- | Automated locator classification       	| 🔜 Future   |
- | HTML/CSS visual regression (screenshots) | 🔜 Future |
+| Capability                             	| Status     |
+|-------------------------------------------|:----------:|
+| ID & Name attribute healing            	| ✅ Done     |
+| `data-testid` fallback healing         	| ✅ Done     |
+| Dynamic loading & auto-waits           	| 🔜 Pending  |
+| Automated locator classification       	| 🔜 Future   |
+| HTML/CSS visual regression (screenshots) | 🔜 Future |

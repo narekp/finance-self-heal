@@ -9,8 +9,24 @@ import sys, json, pathlib, re
 from typing import List, Tuple
 from rich.console import Console          # show HEAL logs in CI and local
 from playwright.sync_api import Page, Locator
-from rapidfuzz import fuzz
+from rapidfuzz import fuzz, process
 from bs4 import BeautifulSoup
+
+# ---Adding a small helper to detect “id” vs “name”-----------------
+
+def _extract_attr(orig_css: str):
+    """
+    If orig_css contains an #id or a name="…", return ("id", value) or ("name", value).
+    Otherwise (None, None).
+    """
+    m = re.search(r"#([\w\-]+)", orig_css)
+    if m:
+        return "id", m.group(1)
+    m = re.search(r"name=['\"]([\w\-]+)['\"]", orig_css)
+    if m:
+        return "name", m.group(1)
+    return None, None
+# ____________________________________________________________
 
 console = Console(file=sys.stdout)        # stream to stdout so GitHub Actions captures it
 CACHE = pathlib.Path("locator_cache.json")
@@ -36,6 +52,18 @@ def fuzzy_find(page: Page, orig_css: str, thresh: int = DEFAULT_THRESHOLD) -> Lo
 
     # ② slow path: scan live DOM ────────────────────────────────────────────
     soup = BeautifulSoup(page.content(), "html.parser")
+    # ―――――― Phase 1: ID/Name–only healing ――――――
+    attr, target = _extract_attr(orig_css)
+    if attr:
+        candidates = [tag[attr] for tag in soup.find_all(attrs={attr: True})]
+        if candidates:
+            healed_value, score, _ = process.extractOne(target, candidates, score_cutoff=thresh) or (None, 0, None)
+            if healed_value:
+                new_sel = f"#{healed_value}" if attr == "id" else f"[name=\"{healed_value}\"]"
+                _update_cache(orig_css, new_sel)
+                _log_once(orig_css, new_sel, int(score))
+                return page.locator(new_sel)
+
     orig_key = re.sub(r"\W+", "", orig_css)
 
     best_score, best_el = 0, None

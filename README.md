@@ -44,3 +44,15 @@ pytest -q
 
 - locator_cache.json and finance_tracker.db are git-ignored and re-created each run.
 - If you forget --recurse-submodules, run git submodule update --init --recursive before pytest.
+
+## 📋 Current Status
+
+ | Capability                             	| Status     |
+ |----------------------------------------	|:----------:|
+-| ID & Name attribute healing            	| ✅ Done     |
+-| `data-testid` fallback healing         	| 🔜 Pending  |
++| ID & Name attribute healing            	| ✅ Done     |
++| `data-testid` fallback healing         	| ✅ Done     |
+ | Dynamic loading & auto-waits           	| 🔜 Pending  |
+ | Automated locator classification       	| 🔜 Future   |
+ | HTML/CSS visual regression (screenshots) | 🔜 Future |

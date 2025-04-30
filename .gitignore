@@ -11,3 +11,5 @@ playwright-report/
 
 # locator cache
 locator_cache.jsonfinance_tracker.db
+locator_cache.json
+finance_tracker.db

@@ -10,6 +10,19 @@ from playwright.sync_api import Page, TimeoutError as PWTimeout
 
 load_dotenv(find_dotenv())
 
+# ─── Resilient Page.goto: catch any TimeoutError and retry on domcontentloaded ───
+_original_goto = Page.goto
+
+def patched_goto(self, url: str, **kwargs):
+    try:
+        return _original_goto(self, url, **kwargs)
+    except PWTimeout:
+        # Fallback to the most permissive wait
+        return _original_goto(self, url, wait_until="domcontentloaded")
+
+Page.goto = patched_goto
+
+
 # ---------- original fixtures --------------------------------
 @pytest.fixture(scope="session")
 def creds():

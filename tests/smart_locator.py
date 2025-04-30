@@ -1,6 +1,5 @@
 """
 Self-healing locator helper.
-
 • fast-path: if orig selector already mapped in locator_cache.json ➜ return it
 • slow-path: fuzzy-scan DOM, cache the mapping, log the heal
 """
@@ -52,6 +51,7 @@ def fuzzy_find(page: Page, orig_css: str, thresh: int = DEFAULT_THRESHOLD) -> Lo
 
     # ② slow path: scan live DOM ────────────────────────────────────────────
     soup = BeautifulSoup(page.content(), "html.parser")
+
     # ―――――― Phase 1: ID/Name–only healing ――――――
     attr, target = _extract_attr(orig_css)
     if attr:
@@ -64,8 +64,22 @@ def fuzzy_find(page: Page, orig_css: str, thresh: int = DEFAULT_THRESHOLD) -> Lo
                 _log_once(orig_css, new_sel, int(score))
                 return page.locator(new_sel)
 
-    orig_key = re.sub(r"\W+", "", orig_css)
+    # ―――――― Phase 2: data-testid Fallback Healing ――――――
+    # If your app uses data-testid="<value>" on elements, heal to the closest one.
+    testids = [tag["data-testid"] for tag in soup.find_all(attrs={"data-testid": True})]
+    if testids:
+        # Compare against the cleaned orig_css key
+        orig_key = re.sub(r"\W+", "", orig_css)
+        match = process.extractOne(orig_key, testids, score_cutoff=thresh)
+        if match:
+            healed_value, score = match[0], int(match[1])
+            new_sel = f"[data-testid=\"{healed_value}\"]"
+            _update_cache(orig_css, new_sel)
+            _log_once(orig_css, new_sel, score)
+            return page.locator(new_sel)
 
+    # ―――――― Phase 1b: Original fuzzy-text/CLASS fallback ――――――
+    orig_key = re.sub(r"\W+", "", orig_css)
     best_score, best_el = 0, None
     for el in soup.find_all(ALLOWED_TAGS):
         cand_text = el.get("id") or el.get("name") or el.get_text() or ""
@@ -94,7 +108,6 @@ def _update_cache(orig: str, new: str) -> None:
     data = json.loads(CACHE.read_text()) if CACHE.exists() else {}
     data[orig] = new
     CACHE.write_text(json.dumps(data, indent=2))
-
 
 def _log_once(orig: str, new: str, score: int) -> None:
     """Log heal only the first time during this run."""

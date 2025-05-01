@@ -54,3 +54,4 @@ pytest -q
 | Dynamic loading & auto-waits           	| 🔜 Pending  |
 | Automated locator classification       	| 🔜 Future   |
 | HTML/CSS visual regression (screenshots) | 🔜 Future |
+| Dashboard & zero-cost visual diffs       | 🔜 Future |

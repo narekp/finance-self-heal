@@ -1,27 +1,22 @@
 # ──────────────────────────────────────────────────────────────
 # tests/conftest.py
 # ──────────────────────────────────────────────────────────────
-
 import sys, rich
-from tests.smart_locator import HEAL_EVENTS, fuzzy_find
 import os, pytest, functools, re
 from dotenv import load_dotenv, find_dotenv
+from tests.smart_locator import HEAL_EVENTS, fuzzy_find
 from playwright.sync_api import Page, TimeoutError as PWTimeout
+import subprocess
 
-load_dotenv(find_dotenv())
-
-# ─── Resilient Page.goto: catch any TimeoutError and retry on domcontentloaded ───
-_original_goto = Page.goto
-
-def patched_goto(self, url: str, **kwargs):
-    try:
-        return _original_goto(self, url, **kwargs)
-    except PWTimeout:
-        # Fallback to the most permissive wait
-        return _original_goto(self, url, wait_until="domcontentloaded")
-
-Page.goto = patched_goto
-
+@pytest.fixture(scope="session", autouse=True)
+def seed_demo_user():
+    """
+    Ensure the demo user exists in SQLite before any test runs.
+    """
+    subprocess.run(
+        ["python", "scripts/seed_user.py"],
+        check=True,
+    )
 
 # ---------- original fixtures --------------------------------
 @pytest.fixture(scope="session")
@@ -29,50 +24,40 @@ def creds():
     return {"u": os.getenv("FT_USER"), "p": os.getenv("FT_PASS")}
 
 def login(page, creds):
+    # 1) Go to login and fill form
     page.goto("http://127.0.0.1:5000/login", wait_until="networkidle")
     page.fill("#username", creds["u"])
     page.fill("#password", creds["p"])
-    page.click("button[type='submit']")
+
+    # 2) Submit and _wait_ for the redirect to finish
+    with page.expect_navigation(wait_until="networkidle"):
+        page.click("button[type='submit']")
 
 # ---------- global smart-locator patch -----------------------
 HEAL_TAGS = {"input", "textarea", "select", "button"}
 
-def pytest_sessionstart(session):                 # runs once
+def pytest_sessionstart(session):
     _patch_page_locator(Page)
     _patch_page_actions(Page)
 
 def _patch_page_locator(PageCls):
     original = PageCls.locator
-
     def patched(self, selector: str, *a, **kw):
-        """
-        Wrap locator() so fill/select_option go through heal logic on timeout.
-        """
         loc = original(self, selector, *a, **kw)
         return _SmartLocator(loc, self, selector)
-
     PageCls.locator = patched
 
 def _patch_page_actions(PageCls):
-    """
-    Only route page.fill and page.select_option through locator().
-    Leave page.click as original to avoid strict-mode issues.
-    """
-    # --- fill ---
+    # route fill/select_option through the healing locator
     def fill(self, selector: str, *a, **kw):
         return self.locator(selector).fill(*a, **kw)
     PageCls.fill = fill
 
-    # --- select_option ---
     def select_option(self, selector: str, *a, **kw):
         return self.locator(selector).select_option(*a, **kw)
     PageCls.select_option = select_option
 
 class _SmartLocator:
-    """
-    Wraps a Playwright Locator to auto-heal on timeout for:
-    fill, select_option, is_visible (click left intact).
-    """
     def __init__(self, raw, page: Page, orig_css: str):
         self._raw  = raw
         self._page = page
@@ -94,17 +79,12 @@ class _SmartLocator:
             raise
 
     def _should_heal(self) -> bool:
-        """
-        Heal when the selector contains an ID (#…), a name=…, or begins
-        with one of HEAL_TAGS (input, textarea, select, button).
-        """
         if "#" in self._orig or "name=" in self._orig:
             return True
         m = re.match(r"(\w+)", self._orig)
         return bool(m and m.group(1).lower() in HEAL_TAGS)
 
 def pytest_sessionfinish(session, exitstatus):
-    """Print one-line summary after all tests."""
     console = rich.console.Console(file=sys.stdout)
     if not HEAL_EVENTS:
         console.print("[green bold]🟢 0 selectors healed (cache up-to-date)")

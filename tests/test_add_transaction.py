@@ -14,17 +14,20 @@ def test_add_transaction(page):
     page.fill("#password", os.environ["FT_PASS"])
     page.click("button[type='submit']")
 
-    # --- navigate ---
+    # --- go to transactions ---
     page.goto("http://127.0.0.1:5000/transactions", wait_until="networkidle")
 
-    # --- add transaction ---
+    # --- open the popup and fill form ---
     page.click("button:has-text('Add Transaction')")
     page.fill("#date", "2025-04-25")
     page.select_option("#category", label="Food")
-    fuzzy_find(page, "input#amount").fill("123")
-    page.locator("select#payment_method").select_option(label="Cash")
+    page.fill("#amount", "123")
+    page.select_option("select#payment_method", label="Cash")
     page.fill("#notes", f"AutoTest-{tag}")
-    page.click("#popup button[type='submit']")
 
-    # --- assert new row exists anywhere in table ---
-    assert page.locator(f"text=AutoTest-{tag}").first.is_visible(timeout=5000)
+    # --- click “Add” and wait for the redirect to /transactions ---
+    with page.expect_navigation(wait_until="networkidle"):
+        page.click("#popup button[type='submit']")
+
+    # --- now assert the new row is visible ---
+    assert page.locator(f"text=AutoTest-{tag}").first.is_visible(timeout=5_000)

@@ -1,108 +1,90 @@
 {
   "/": [
     {
-      "css": "input#user_name",
-      "tag": "input",
-      "type": "text"
+      "selector": "#user_name",
+      "class": "input.text"
     },
     {
-      "css": "input#pass",
-      "tag": "input",
-      "type": "password"
+      "selector": "#pass",
+      "class": "input.password"
     }
   ],
   "/login": [
     {
-      "css": "input#user_name",
-      "tag": "input",
-      "type": "text"
+      "selector": "#user_name",
+      "class": "input.text"
     },
     {
-      "css": "input#pass",
-      "tag": "input",
-      "type": "password"
+      "selector": "#pass",
+      "class": "input.password"
     }
   ],
   "/logout": [
     {
-      "css": "input#user_name",
-      "tag": "input",
-      "type": "text"
+      "selector": "#user_name",
+      "class": "input.text"
     },
     {
-      "css": "input#pass",
-      "tag": "input",
-      "type": "password"
+      "selector": "#pass",
+      "class": "input.password"
     }
   ],
   "/register": [
     {
-      "css": "input#username",
-      "tag": "input",
-      "type": "text"
+      "selector": "#username",
+      "class": "input.text"
     },
     {
-      "css": "input#email",
-      "tag": "input",
-      "type": "email"
+      "selector": "#email",
+      "class": "input.email"
     },
     {
-      "css": "input#phone",
-      "tag": "input",
-      "type": "tel"
+      "selector": "#phone",
+      "class": "input.tel"
     },
     {
-      "css": "input#password",
-      "tag": "input",
-      "type": "password"
+      "selector": "#password",
+      "class": "input.password"
     }
   ],
   "/transactions": [
     {
-      "css": "input#user_name",
-      "tag": "input",
-      "type": "text"
+      "selector": "#user_name",
+      "class": "input.text"
     },
     {
-      "css": "input#pass",
-      "tag": "input",
-      "type": "password"
+      "selector": "#pass",
+      "class": "input.password"
     }
   ],
   "/daily_spending_data": [
     {
-      "css": "input#user_name",
-      "tag": "input",
-      "type": "text"
+      "selector": "#user_name",
+      "class": "input.text"
     },
     {
-      "css": "input#pass",
-      "tag": "input",
-      "type": "password"
+      "selector": "#pass",
+      "class": "input.password"
     }
   ],
   "/monthly_spending_data": [
     {
-      "css": "input#user_name",
-      "tag": "input",
-      "type": "text"
+      "selector": "#user_name",
+      "class": "input.text"
     },
     {
-      "css": "input#pass",
-      "tag": "input",
-      "type": "password"
+      "selector": "#pass",
+      "class": "input.password"
     }
   ],
   "/statistics": [
     {
-      "css": "input#user_name",
-      "tag": "input",
-      "type": "text"
+      "selector": "#user_name",
+      "class": "input.text"
     },
     {
-      "css": "input#pass",
-      "tag": "input",
-      "type": "password"
+      "selector": "#pass",
+      "class": "input.password"
     }
   ]
 }

@@ -39,6 +39,17 @@ from app import app as FLASK_APP          # safe: we import the module app.py
 OUT  = ROOT / "selector_registry.json"
 TAGS = {"input", "select", "textarea", "button", "a"}
 
+
+# ---tiny helper that inspects the element and emits a class string---
+def classify(el):
+    """Coarse element class used later for fuzzy‑match scoring."""
+    if el.name == "input":
+        input_type = el.get("type", "text").lower()        # text, number, …
+        return f"input.{input_type}"
+    if el.name == "button":
+        return "button.submit" if el.get("type", "").lower() == "submit" else "button"
+    return el.name    # textarea, select, a, …
+
 async def crawl():
     async with async_playwright() as pw:
         browser = await pw.chromium.launch()
@@ -60,14 +71,25 @@ async def crawl():
     OUT.write_text(json.dumps(catalog, indent=2))
     print(f"✔ wrote {OUT.name} with {sum(len(v) for v in catalog.values())} selectors")
 
-def parse(html: str):
+def parse(html):
     soup = BeautifulSoup(html, "html.parser")
-    nodes = []
+    selectors = []
+
     for tag in soup.find_all(TAGS):
-        sel = selector(tag)
-        if sel:
-            nodes.append({"css": sel, "tag": tag.name, "type": tag.get("type", "")})
-    return nodes
+        id_   = tag.get("id")
+        name_ = tag.get("name")
+
+        if not id_ and not name_:
+            continue                      # nothing to heal against
+
+        entry = {
+            "selector": f"#{id_}" if id_ else f'[name="{name_}"]',
+            "class":    classify(tag),    # <─ NEW
+        }
+        selectors.append(entry)
+
+    return selectors
+
 
 def selector(tag):
     if tag.get("id"):

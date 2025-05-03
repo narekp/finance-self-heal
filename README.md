@@ -52,8 +52,5 @@ pytest -q
 | **ID / name selector healing**               | ✅ Done | Phase 1 algorithm (RapidFuzz) in `smart_locator.py`. |
 | **`data-testid` fallback healing**           | ✅ Done | Phase 2 implemented; kicks in after ID/Name. |
 | **Resilient `Page.goto` (networkidle→load)** | ✅ Done | Minimal patch; removed over‑broad retries. |
-| **Click strict‑mode fallback**               | ✅ *N/A* | Deleted (was masking real selector bugs). |
-| **Dynamic loading & auto‑waits**             | ⏳ *Planned* | Track in **Task 3** below. |
-| **Regression tests for async flows**         | ⏳ *Planned* | Will come with auto‑wait work. |
-| **Automated selector‑classification registry** | 🔜 Future | Phase 3+. |
-| **Healing / visual‑diff dashboard**          | 🔜 Future | Idea parked; see “Dashboard” task. |
+| **Automated selector‑classification registry** | 🔜 in progress | Make new/changed elements auto‑healable without touching test code |
+| **Healing/Metrics dashboard**          | 🔜 Future | Quick visual insight|

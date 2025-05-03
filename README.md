@@ -18,7 +18,22 @@ Project shows how to wrap Playwright’s locator calls with an AI-enhanced, fuzz
 - **Form control coverage**: Works out of the box on `<input>`, `<textarea>`, `<select>`, and buttons  
 - **Cache-first lookup**: Once a broken selector is healed, it never scans the DOM again  
 - **Clear test output**: Rich logs show exactly which selectors healed and their fuzzy-match score  
-- **Extensible**: Next steps include `data-testid` support, timeout-aware waits, and optional visual diffs  
+- ### 🗺️ Selector Registry
+
+`scripts/catalog_selectors.py` crawls every **GET** route exposed by the Flask
+demo (`/`, `/login`, `/transactions`, …).  For each page it records the
+CSS selectors of UI controls – `input`, `select`, `textarea`, `button`, `a`.
+
+```bash
+python scripts/catalog_selectors.py      # ⇢ writes selector_registry.json
+```
+
+`selector_registry.json` maps **route → selector list**.  
+Current demo size: **18 selectors across 8 routes**.
+
+The registry enables upcoming automation:
+* alert on *new / deleted* selectors in PRs  
+* feed coverage stats to the healing‑metrics dashboard  
 
 ## Quick-Start
 
@@ -51,6 +66,7 @@ pytest -q
 |----------------------------------------------|:-------:|-------|
 | **ID / name selector healing**               | ✅ Done | Phase 1 algorithm (RapidFuzz) in `smart_locator.py`. |
 | **`data-testid` fallback healing**           | ✅ Done | Phase 2 implemented; kicks in after ID/Name. |
-| **Resilient `Page.goto` (networkidle→load)** | ✅ Done | Minimal patch; removed over‑broad retries. |
-| **Automated selector‑classification registry** | 🔜 in progress | Make new/changed elements auto‑healable without touching test code |
-| **Healing/Metrics dashboard**          | 🔜 Future | Quick visual insight|
+| **stable `Page.goto` (networkidle→load)** | ✅ Done | Minimal patch; removed over‑broad retries. |
+| **Selector‑registry generator**              | ✅ Done | `catalog_selectors.py` + nightly Action |
+| **Automated selector‑classification registry**| in progress | Use the registry to auto‑label and validate new elements |
+| **Healing/Metrics dashboard**          | Future | Quick visual insight|

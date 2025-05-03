@@ -8,6 +8,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-22.04              # pin runner to 22.04 so Playwright deps install cleanly
+    permissions:
+      contents: write
     steps:
       #1  Check out repo
       - uses: actions/checkout@v4
@@ -34,7 +36,22 @@ jobs:
       #6 install the app’s requirements launching
       - run: pip install -r app/requirements.txt      # NEW: Flask, SQLAlchemy, etc.
 
-      # 6 Launch Finance-Tracker Flask server in the background
+      #7 runs the catalog script on every pull‑request regenerating the selector_registry.json, commits it if changed amd pushes in same PR context (skips if no diff)
+      - name: Update selector registry
+        run: |
+          python scripts/catalog_selectors.py
+          if ! git diff --quiet selector_registry.json ; then
+            git config user.name  "ci‑bot"
+            git config user.email "ci@github"
+            git add selector_registry.json
+            git commit -m "ci: auto‑update selector registry"
+            # push only if we have a token (own repo, not fork PR)
+            if [ "${{ github.repository_owner }}" = "narekp" ]; then
+              git push origin HEAD:${{ github.ref_name }}
+            fi
+          fi
+
+      # 8 Launch Finance-Tracker Flask server in the background
       - name: Launch Finance-Tracker
         run: |
           python scripts/seed_user.py          # seed DB first
@@ -42,6 +59,6 @@ jobs:
           python app.py &                      # start server
           sleep 3
 
-      #7 Run Playwright test suite
+      #9 Run Playwright test suite
       - name: Run Playwright test suite
         run: pytest --capture=tee-sys -v    # streams Rich output

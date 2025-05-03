@@ -36,7 +36,15 @@ jobs:
       #6 install the app’s requirements launching
       - run: pip install -r app/requirements.txt      # NEW: Flask, SQLAlchemy, etc.
 
-      #7 runs the catalog script on every pull‑request regenerating the selector_registry.json, commits it if changed amd pushes in same PR context (skips if no diff)
+      #7 Launch Finance-Tracker Flask server in the background
+      - name: Launch Finance-Tracker
+        run: |
+          python scripts/seed_user.py          # seed DB first
+          cd app                               # enter submodule
+          python app.py &                      # start server
+          sleep 3
+
+      #8 runs the catalog script on every pull‑request regenerating the selector_registry.json, commits it if changed amd pushes in same PR context (skips if no diff)
       - name: Update selector registry
         run: |
           python scripts/catalog_selectors.py
@@ -50,14 +58,6 @@ jobs:
               git push origin HEAD:${{ github.ref_name }}
             fi
           fi
-
-      # 8 Launch Finance-Tracker Flask server in the background
-      - name: Launch Finance-Tracker
-        run: |
-          python scripts/seed_user.py          # seed DB first
-          cd app                               # enter submodule
-          python app.py &                      # start server
-          sleep 3
 
       #9 Run Playwright test suite
       - name: Run Playwright test suite

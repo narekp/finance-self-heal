@@ -4,15 +4,15 @@ on:
     paths-ignore:
       - 'README.md' # not running the CI when README.md is the only thing pushed to master
   pull_request:
-  workflow_dispatch:  # enables manual "Run workflow"
+  workflow_dispatch:  # enable manual "Run workflow"
 
 jobs:
   test:
-    runs-on: ubuntu-22.04              # pin runner to 22.04 so Playwright deps install cleanly
+    runs-on: ubuntu-22.04 # pinning runner to 22.04 so Playwright deps install cleanly
     permissions:
       contents: write
     steps:
-      #1  Check out repo
+      #1 Check out repo
       - uses: actions/checkout@v4
 
       #2 Pull submodule with the Flask demo
@@ -34,13 +34,13 @@ jobs:
           echo "FT_USER=${{ secrets.FT_USER }}" >> $GITHUB_ENV
           echo "FT_PASS=${{ secrets.FT_PASS }}" >> $GITHUB_ENV
 
-      #6 install the app’s requirements launching
-      - run: pip install -r app/requirements.txt      # NEW: Flask, SQLAlchemy, etc.
+      #6 install the app’s requirements 
+      - run: pip install -r app/requirements.txt
 
       #7 Launch Finance-Tracker Flask server in the background
       - name: Launch Finance-Tracker
         run: |
-          python scripts/seed_user.py          # seed DB first
+          python scripts/seed_user.py          # seed DB firstly
           cd app                               # enter submodule
           python app.py &                      # start server
           sleep 3
@@ -62,4 +62,4 @@ jobs:
 
       #9 Run Playwright test suite
       - name: Run Playwright test suite
-        run: pytest --capture=tee-sys -v    # streams Rich output
+        run: pytest --capture=tee-sys -v    # streams Rich output for good context

@@ -9,8 +9,8 @@
   
   <span style="margin-left: 20px;"></span> -**Automation architecture**  
   <span style="margin-left: 20px;"></span> -**AI-backed heuristics** (RapidFuzz + DOM analysis)  
-  <span style="margin-left: 20px;"></span> -**CI/CD rigor** (GitHub Actions integration)  
-  <span style="margin-left: 20px;"></span> -**Task decomposition** (breakdown in Issues)
+  <span style="margin-left: 20px;"></span> -**CI/CD** (GitHub Actions)  
+  <span style="margin-left: 20px;"></span> -**Task decomposition** (see "Issues")
 
 
 ## 🚦 Why it matters

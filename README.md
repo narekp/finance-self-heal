@@ -88,5 +88,5 @@ CI runs this automatically and pushes the diff when the UI changes.
 
 ## 🤝 Let’s talk
 > I built this repo to showcase AI‑augmented QA engineering - mixing heuristics, open‑source tools and clean CI/CD practice.
-> If that mindset could help your team, drop me a line on [Linkedin](https://www.linkedin.com/in/narek-petrosyan/).
+> Let's connect on [Linkedin](https://www.linkedin.com/in/narek-petrosyan/).
 > PRs and ideas are welcome!
